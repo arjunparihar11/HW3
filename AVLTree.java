@@ -362,6 +362,65 @@ class LUC_AVLTree {
          * do many of the same things as this method.
          */
 
+        //if the node is null, return null
+        if (node == null) {
+            return null;
+        }
+        //recursively search for the node to delete in the left or right subtree
+        if (value < node.value) {
+            //if the value to delete is smaller, it is in the left subtree
+            node.leftChild = deleteElement(value, node.leftChild);
+        } else if (value > node.value) {
+            //if the value to delete is larger, it is in the right subtree
+            node.rightChild = deleteElement(value, node.rightChild);
+        } else {
+            //node with only one or no child
+            if (node.leftChild == null || node.rightChild == null) {
+                Node temp = node.leftChild != null ? node.leftChild : node.rightChild;
+            
+                //no child
+                if (temp == null) {
+                    temp = node;
+                    node = null;
+                } else {
+                    //one child
+                    node = temp;  //copy of the non-empty child
+                }
+            } else {
+                //node with two children
+                //smallest in the right subtree
+                Node temp = minValueNode(node.rightChild);
+                //copy the  value to this node
+                node.value = temp.value;
+                //delete
+                node.rightChild = deleteElement(temp.value, node.rightChild);
+            }
+        }
+        //if tree only had one node, return null
+        if (node == null) {
+            return node;
+        }
+        //update the height of the current node
+        node.height = getMaxHeight(getHeight(node.leftChild), getHeight(node.rightChild)) + 1;
+        //get the balance to check if the node is balanced
+        int balanceFactor = getBalanceFactor(node);
+        //Left Left
+        if (balanceFactor > 1 && getBalanceFactor(node.leftChild) >= 0) {
+            return LLRotation(node);
+        }
+        //Left Right
+        if (balanceFactor > 1 && getBalanceFactor(node.leftChild) < 0) {
+            return LRRotation(node);
+        }
+        //Right Right
+        if (balanceFactor < -1 && getBalanceFactor(node.rightChild) <= 0) {
+            return RRRotation(node);
+        }
+        //Right Left 
+        if (balanceFactor < -1 && getBalanceFactor(node.rightChild) > 0) {
+            return RLRotation(node);
+        }
+        // Return the root node
         return node;
     }
 
